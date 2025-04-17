@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Globe, Plus, Moon, Sun } from 'lucide-react';
 import { useWebsites } from '@/hooks/useWebsites';
 import axios from 'axios';
@@ -14,9 +14,8 @@ interface Website {
     status: string;
     createdAt: string;
     latency: number;
-  };
+  }[];
 }
-
 
 type UptimeStatus = "good" | "bad" | "unknown";
 
@@ -49,34 +48,34 @@ function CreateWebsiteModal({ isOpen, onClose }: { isOpen: boolean; onClose: (ur
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4 dark:text-white">Add New Website</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              URL
-            </label>
-            <input
-              type="url"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              type="button"
-              onClick={() => onClose(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              onClick={() => onClose(url)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-            >
-              Add Website
-            </button>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            URL
+          </label>
+          <input
+            type="url"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            type="button"
+            onClick={() => onClose(null)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={() => onClose(url)}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+          >
+            Add Website
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -117,7 +116,7 @@ function WebsiteCard({ website }: { website: ProcessedWebsite }) {
           )}
         </div>
       </div>
-      
+
       {isExpanded && (
         <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700">
           <div className="mt-3">
@@ -136,73 +135,78 @@ function WebsiteCard({ website }: { website: ProcessedWebsite }) {
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const websites = useWebsites();
+  const { websites = [], loading, error } = useWebsites();
+  
   const { getToken } = useAuth();
+  console.log("Websites from useWebsites:", websites, "Loading:", loading, "Error:", error);
 
   const processedWebsites = useMemo(() => {
-    return websites.websites.map((website: Website) => {
-      // Sort ticks by creation time
-      const sortedTicks: Website['ticks'][] = Array.isArray(website.ticks) 
-      ? [...website.ticks].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-      : [];
-
-      // Get the most recent 30 minutes of ticks
-      const thirtyMinutesAgo: Date = new Date(Date.now() - 30 * 60 * 1000);
-      const recentTicks: Website['ticks'][] = sortedTicks.filter(tick => 
-      new Date(tick.createdAt) > thirtyMinutesAgo
+    if (!websites || !Array.isArray(websites)) {
+      return [];
+    }
+    
+    return websites.map((website) => {
+      const ticks = website.ticks || [];
+      const sortedTicks = [...ticks].sort((a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      // Aggregate ticks into 3-minute windows (10 windows total)
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+      const recentTicks = sortedTicks.filter(tick => new Date(tick.createdAt) > thirtyMinutesAgo);
+
       const windows: UptimeStatus[] = [];
-
       for (let i = 0; i < 10; i++) {
-      const windowStart: Date = new Date(Date.now() - (i + 1) * 3 * 60 * 1000);
-      const windowEnd: Date = new Date(Date.now() - i * 3 * 60 * 1000);
-      
-      const windowTicks: Website['ticks'][] = recentTicks.filter(tick => {
-        const tickTime: Date = new Date(tick.createdAt);
-        return tickTime >= windowStart && tickTime < windowEnd;
-      });
-
-      // Window is considered up if majority of ticks are up
-      const upTicks: number = windowTicks.filter(tick => tick.status === 'Good').length;
-      windows[9 - i] = windowTicks.length === 0 ? "unknown" : (upTicks / windowTicks.length) >= 0.5 ? "good" : "bad";
+        const windowStart = new Date(Date.now() - (i + 1) * 3 * 60 * 1000);
+        const windowEnd = new Date(Date.now() - i * 3 * 60 * 1000);
+        const windowTicks = recentTicks.filter(tick => {
+          const tickTime = new Date(tick.createdAt);
+          return tickTime >= windowStart && tickTime < windowEnd;
+        });
+        const upTicks = windowTicks.filter(tick => tick.status === 'Good').length;
+        windows[9 - i] = windowTicks.length === 0 ? "unknown" : (upTicks / windowTicks.length) >= 0.5 ? "good" : "bad";
       }
 
-      // Calculate overall status and uptime percentage
-      const totalTicks: number = sortedTicks.length;
-      const upTicks: number = sortedTicks.filter(tick => tick.status === 'Good').length;
-      const uptimePercentage: number = totalTicks === 0 ? 100 : (upTicks / totalTicks) * 100;
-
-      // Get the most recent status
-      const currentStatus: UptimeStatus = windows[windows.length - 1];
-
-      // Format the last checked time
-      const lastChecked: string = sortedTicks[0]
-      ? new Date(sortedTicks[0].createdAt).toLocaleTimeString()
-      : 'Never';
+      const totalTicks = sortedTicks.length;
+      const upTicks = sortedTicks.filter(tick => tick.status === 'Good').length;
+      const uptimePercentage = totalTicks === 0 ? 100 : (upTicks / totalTicks) * 100;
+      const currentStatus = windows[windows.length - 1];
+      const lastChecked = sortedTicks[0]
+        ? new Date(sortedTicks[0].createdAt).toLocaleTimeString()
+        : 'Never';
 
       return {
-      id: website.id,
-      url: website.url,
-      status: currentStatus,
-      uptimePercentage,
-      lastChecked,
-      uptimeTicks: windows,
+        id: website.id,
+        url: website.url,
+        status: currentStatus,
+        uptimePercentage,
+        lastChecked,
+        uptimeTicks: windows,
       } as ProcessedWebsite;
     });
   }, [websites]);
 
-  // Toggle dark mode
-  React.useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
+
+  const handleAddWebsite = async (url: string | null) => {
+    setIsModalOpen(false);
+    if (!url) return;
+    const token = await getToken();
+    try {
+      await axios.post(
+        `${API_BACKEND_URI}/api/v1/website`,
+        { url },
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
+    } catch (error) {
+      console.error("Error adding website:", error);
+    }
+  };
+  console.log("Websites from useWebsites:", websites);
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -232,28 +236,21 @@ function App() {
             </button>
           </div>
         </div>
-        
+
         <div className="space-y-4">
-          {processedWebsites.map((website) => (
-            <WebsiteCard key={website.id} website={website} />
-          ))}
+          {processedWebsites.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+              <p className="text-gray-600 dark:text-gray-300">No websites added yet. Click "Add Website" to get started.</p>
+            </div>
+          ) : (
+            processedWebsites.map((website) => (
+              <WebsiteCard key={website.id} website={website} />
+            ))
+          )}
         </div>
       </div>
 
-      <CreateWebsiteModal
-        isOpen={isModalOpen}
-        onClose={(url) => {
-          const token = getToken();
-                setIsModalOpen(false) 
-              axios.post(`${API_BACKEND_URI}/api/v1/website`, 
-                { url },
-                { headers: 
-                  { Authorization: `${token}` }
-                })
-
-             
-            }}
-      />
+      <CreateWebsiteModal isOpen={isModalOpen} onClose={handleAddWebsite} />
     </div>
   );
 }
