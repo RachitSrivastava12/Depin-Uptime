@@ -28,7 +28,7 @@ export function useWebsites() {
       const auth = await getToken();
       const response = await axios.get(`${API_BACKEND_URI}/api/v1/websites`, {
         headers: {
-          Authorization: `${auth}`,
+          Authorization: auth,
         },
       });
       

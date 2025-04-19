@@ -11,7 +11,7 @@ interface Website {
   url: string;
   ticks: {
     id: string;
-    status: string;
+    status: string; // This can be "Good", "Bad", etc. from your database
     createdAt: string;
     latency: number;
   }[];
@@ -21,7 +21,13 @@ type UptimeStatus = "good" | "bad" | "unknown";
 
 function StatusCircle({ status }: { status: UptimeStatus }) {
   return (
-    <div className={`w-3 h-3 rounded-full ${status === 'good' ? 'bg-green-500' : status === 'bad' ? 'bg-red-500' : 'bg-gray-500'}`} />
+    <div
+      className={`w-3 h-3 rounded-full ${
+        status === 'good' ? 'bg-green-500' :
+        status === 'bad' ? 'bg-red-500' :
+        'bg-gray-500'
+      }`}
+    />
   );
 }
 
@@ -162,12 +168,21 @@ function App() {
           const tickTime = new Date(tick.createdAt);
           return tickTime >= windowStart && tickTime < windowEnd;
         });
-        const upTicks = windowTicks.filter(tick => tick.status === 'Good').length;
-        windows[9 - i] = windowTicks.length === 0 ? "unknown" : (upTicks / windowTicks.length) >= 0.5 ? "good" : "bad";
+        
+        // FIXED: Handle case sensitivity correctly by ensuring both are lowercase
+        const upTicks = windowTicks.filter(tick => tick.status.toLowerCase() === 'good').length;
+        
+        // Determine window status based on uptime ratio
+        windows[9 - i] = windowTicks.length === 0 
+          ? "unknown" 
+          : (upTicks / windowTicks.length) >= 0.5 
+            ? "good" 
+            : "bad";
       }
 
       const totalTicks = sortedTicks.length;
-      const upTicks = sortedTicks.filter(tick => tick.status === 'Good').length;
+      // FIXED: Correctly handle case sensitivity here as well
+      const upTicks = sortedTicks.filter(tick => tick.status.toLowerCase() === 'good').length;
       const uptimePercentage = totalTicks === 0 ? 100 : (upTicks / totalTicks) * 100;
       const currentStatus = windows[windows.length - 1];
       const lastChecked = sortedTicks[0]
@@ -198,15 +213,14 @@ function App() {
         `${API_BACKEND_URI}/api/v1/website`,
         { url },
         {
-          headers: { Authorization: `${token}` },
+          headers: { Authorization: token },
         }
       );
     } catch (error) {
       console.error("Error adding website:", error);
     }
   };
-  console.log("Websites from useWebsites:", websites);
-
+  console.log("Processed websites:", processedWebsites);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -222,34 +236,34 @@ function App() {
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
             >
               {isDarkMode ? (
-                <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                <Sun className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               ) : (
-                <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                <Moon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               )}
             </button>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              className="flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
               <span>Add Website</span>
             </button>
           </div>
         </div>
-
-        <div className="space-y-4">
-          {processedWebsites.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
-              <p className="text-gray-600 dark:text-gray-300">No websites added yet. Click "Add Website" to get started.</p>
-            </div>
-          ) : (
-            processedWebsites.map((website) => (
+        {loading ? (
+          <div className="text-center text-lg text-gray-600 dark:text-gray-300">Loading...</div>
+        ) : error ? (
+          <div className="text-center text-lg text-red-600 dark:text-red-500">Error loading websites</div>
+        ) : processedWebsites.length === 0 ? (
+          <div className="text-center text-lg text-gray-600 dark:text-gray-300">No websites added yet</div>
+        ) : (
+          <div className="space-y-4">
+            {processedWebsites.map((website) => (
               <WebsiteCard key={website.id} website={website} />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-
       <CreateWebsiteModal isOpen={isModalOpen} onClose={handleAddWebsite} />
     </div>
   );
