@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@clerk/nextjs": "^6.14.3",
+=======
+    "@clerk/nextjs": "^6.16.0",
+>>>>>>> 37b9cda (Add navigation)
     "@radix-ui/react-slot": "^1.2.0",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
@@ -18,7 +22,11 @@
     "lucide-react": "^0.487.0",
     "next": "15.3.0",
     "next-themes": "^0.4.6",
+<<<<<<< HEAD
     "react": "^19.0.0",
+=======
+    "react": "^19.1.0",
+>>>>>>> 37b9cda (Add navigation)
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.2.0",
     "tw-animate-css": "^1.2.5"

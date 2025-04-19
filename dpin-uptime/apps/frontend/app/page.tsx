@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Moon, Sun, Activity, Shield, Globe, Bell, ArrowRight, Check } from 'lucide-react';
-import c from 'config';
-
+import { useRouter } from 'next/navigation';
 function App() {
   const [darkMode, setDarkMode] = useState(true);
+  const router = useRouter()
 
   const features = [
     { icon: Activity, title: 'Real-time Monitoring', description: 'Monitor your services with 99.9% accuracy and instant notifications' },
@@ -41,7 +41,7 @@ function App() {
             whileTap={{ scale: 0.95 }}
             className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold flex items-center mx-auto space-x-2 hover:bg-purple-700 transition-colors"
           >
-            <span>Start Monitoring</span>
+            <span onClick={() => router.push('/dashboard')}>Start Monitoring</span>
             <ArrowRight className="w-5 h-5" />
           </motion.button>
         </motion.div>

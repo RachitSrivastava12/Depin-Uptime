@@ -1,7 +1,8 @@
 import express from "express";
 import { authMiddleware } from "./middleware";
 import { prismaClient } from "db/client";
-import cors from "cors";
+import cors from 'cors';
+
 
 const app = express();
 
@@ -51,18 +52,18 @@ app.get("/api/v1/websites", authMiddleware,async(req, res) => {
 app.delete("/api/v1/website/:websiteId",authMiddleware, async (req, res) => {
     const websiteId = req.body.websiteId;
     const userId = req.userId!;
-  await  prismaClient.website.update({
-        where: {
-            id: websiteId,
-            userId
-        },
-        data: {
-            disabled: true
-        }
+await prismaClient.website.update({
+            where: {
+                    id: websiteId as string,
+                    userId: userId as string
+            },
+            data: {
+                    disabled: true
+            }
     }).then(() => {
-        console.log("Website deleted successfully");
-    }).catch((error) => {
-        console.error("Error deleting website:", error);
+            console.log("Website deleted successfully");
+    }).catch((error: Error) => {
+            console.error("Error deleting website:", error);
     });
     res.json({ message: "Website deleted successfully" });
 }

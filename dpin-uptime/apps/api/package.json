@@ -10,6 +10,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@types/cors": "^2.8.17",
+>>>>>>> 37b9cda (Add navigation)
     "@types/express": "^5.0.1",
     "cors": "^2.8.5",
     "db": "*",
