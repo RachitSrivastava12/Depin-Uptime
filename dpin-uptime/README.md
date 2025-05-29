@@ -1,90 +1,39 @@
-# Turborepo starter
+# DePIN Monitor for Solana
 
-This Turborepo starter is maintained by the Turborepo core team.
+## Overview
+DePIN Monitor for Solana is a decentralized uptime monitoring platform for all websites (Web2 and Web3), built on the Solana blockchain. It uses a Decentralized Physical Infrastructure Network (DePIN) of incentivized nodes to track website uptime globally, logs data on Solana for transparency, and provides a dashboard for users. This project was developed with a Solana Foundation & CoinDCX Grant to empower Solana developers with a reliable monitoring tool while promoting decentralization.
 
-## Using this example
+## Problem
+Centralized uptime monitoring platforms lack global coverage, transparency, and introduce single points of failure, impacting developers building services reliant on any website, including Web2 sites like `google.com`.
 
-Run the following command:
+## Solution
+DePIN Monitor for Solana creates a decentralized network of nodes to monitor website uptime. Nodes ping websites, log data on Solana, and users can view uptime metrics (e.g., 99.8% uptime) on a dashboard. It leverages Solana’s high throughput and low costs for scalability and transparency.
 
-```sh
-npx create-turbo@latest
-```
+## Features
+- Decentralized monitoring with a DePIN network of 20+ nodes.
+- Real-time uptime data logged on Solana for transparency.
+- Dashboard to view uptime metrics for any website.
+- Open-source deployment on Solana’s Mainnet Beta.
 
-## What's inside?
+## Project Goals
+- Launch a basic uptime monitoring platform for Solana developers.
+- Onboard 20 nodes to the DePIN network for initial global coverage.
+- Deploy as open-source on Solana’s Mainnet Beta.
 
-This Turborepo includes the following packages/apps:
+## How It Works
+1. Users submit a website (e.g., `google.com`) via the platform.
+2. DePIN nodes ping the website every 5 minutes from different regions.
+3. Uptime data is logged on Solana via a smart contract.
+4. Users view metrics (e.g., uptime percentage, latency) on a dashboard.
 
-### Apps and Packages
+## Setup Instructions
+### Prerequisites
+- Node.js (v16 or higher)
+- Solana CLI (for interacting with Solana blockchain)
+- A Solana wallet (e.g., Phantom) to receive node incentives
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
-
-
-
-
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_aWRlYWwtdGV0cmEtMTUuY2xlcmsuYWNjb3VudHMuZGV2JA
-CLERK_SECRET_KEY=sk_test_xInwP7mT4kamvE5gDa1VC0bmexkW8AcmmlnqLyP11X
+### Running a Node
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/<your-username>/depin-monitor-solana.git
+   cd depin-monitor-solana
