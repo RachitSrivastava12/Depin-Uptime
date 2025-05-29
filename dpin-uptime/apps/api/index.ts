@@ -6,7 +6,12 @@ import cors from 'cors';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Your frontend URL
+    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+  
 app.use(express.json());
 
 
@@ -69,6 +74,8 @@ await prismaClient.website.update({
 }
 );
 
-app.listen(8080, () => {    
-    console.log("Server is running on port 3000");
-}   );
+// Change this line in your backend code
+app.listen(8080, () => {
+    console.log("Server is running on port 8080"); // Fixed to match actual port
+  });
+  

@@ -268,7 +268,9 @@ function App() {
                 className="lg:w-1/2 mb-12 lg:mb-0"
               >
                 <span className="inline-block px-4 py-1 mb-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium text-sm">
-                  Next-Gen Monitoring
+
+
+x                  Next-Gen Monitoring
                 </span>
                 <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Keep Your Services 

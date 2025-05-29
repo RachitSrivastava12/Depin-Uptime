@@ -82,3 +82,9 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
 - [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
 - [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+
+
+
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_aWRlYWwtdGV0cmEtMTUuY2xlcmsuYWNjb3VudHMuZGV2JA
+CLERK_SECRET_KEY=sk_test_xInwP7mT4kamvE5gDa1VC0bmexkW8AcmmlnqLyP11X

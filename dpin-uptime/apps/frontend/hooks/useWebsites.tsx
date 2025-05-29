@@ -22,42 +22,49 @@ export function useWebsites() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  
   async function refreshWebsite() {
     try {
       setLoading(true);
-      const auth = await getToken();
+      const token = await getToken();
+      
       const response = await axios.get(`${API_BACKEND_URI}/api/v1/websites`, {
         headers: {
-          Authorization: auth,
+          Authorization: `Bearer ${token}`,
         },
       });
-      
+  
       console.log("API Response:", response.data);
-      
-      // Check if response.data is an array directly
+  
       if (Array.isArray(response.data)) {
         console.log("Setting websites directly from array");
         setWebsites(response.data);
-      } 
-      // Check if response.data.websites exists and is an array
-      else if (response.data && Array.isArray(response.data.websites)) {
+      } else if (response.data && Array.isArray(response.data.websites)) {
         console.log("Setting websites from response.data.websites");
         setWebsites(response.data.websites);
-      }
-      // If neither case matches, log the structure for debugging
-      else {
+      } else {
         console.error("Unexpected API response structure:", response.data);
         setError("Unexpected data format from API");
       }
-      
+  
       setLoading(false);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error refreshing websites:", error);
+  
+      if (axios.isAxiosError(error)) {
+        console.error("Axios Error Response:", error.response?.data);
+        console.error("Axios Error Status:", error.response?.status);
+        console.error("Axios Error Headers:", error.response?.headers);
+      } else {
+        console.error("General Error:", error);
+      }
+  
       setError("Failed to fetch websites");
       setLoading(false);
     }
   }
+  
 
   useEffect(() => {
     refreshWebsite();
