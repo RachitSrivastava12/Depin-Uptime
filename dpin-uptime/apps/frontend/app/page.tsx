@@ -774,6 +774,7 @@ x                  Next-Gen Monitoring
         </div>
       </footer>
     </div>
+    <div>footer</div>
   );
 }
 
